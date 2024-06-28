@@ -27,7 +27,6 @@ count = 0
 
 with open(input_csv) as f:
     for num, row in enumerate(f):
-        pdb.set_trace()
         if num >2: # get rid of titles
             count += 1
             readrow = [int(float(x)) for x in row.split()[:5]]
