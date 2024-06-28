@@ -13,8 +13,8 @@ input2 = sys.argv[2]# ref fasta
 input_csv = input1 # columns = position, A, C, G, T
 refseq = input2
 
-output_filename = input2 + '_call.csv'
-depth_checker_filename = input2 + '_depth_checker.csv'
+output_filename = input1 + '_call.csv'
+depth_checker_filename = input1 + '_depth_checker.csv'
 
 #==============================================================================
 # Calculation
@@ -26,14 +26,15 @@ min_read_depth  = 1
 count = 0
 
 with open(input_csv) as f:
-    for num,row in enumerate(f):
+    for num, row in enumerate(f):
+        pdb.set_trace()
         if num >2: # get rid of titles
             count += 1
             readrow = [int(float(x)) for x in row.split()[:5]]
             position = readrow[0]
             ref = refpos[position-1].upper() 
-            
-            rowdic = {'A': readrow[1], 'C':readrow[2],'G':readrow[3],'T':readrow[4]}
+
+            rowdic = {'A': readrow[1], 'C': readrow[2], 'G': readrow[3], 'T': readrow[4]}
             sumall = sum((rowdic.values()))
             poslist.append([position, sumall])
 
@@ -57,7 +58,7 @@ with open(input_csv) as f:
                     output.append(out)
                     count = position
                     
-                
+
             elif sumall == 0:
                 out = {'Position': position,
                        'Mutation': 'Read Depth = 0',
@@ -67,12 +68,12 @@ with open(input_csv) as f:
                 output.append(out)
 
 # read depth more than 0
-            
-            else:           
-                base = max(rowdic.keys(), key = (lambda key: rowdic[key]))             
+
+            else:
+                base = max(rowdic.keys(), key = (lambda key: rowdic[key]))
                 depth_ref = rowdic[ref]
-                depth_base = rowdic[base]              
-                try: 
+                depth_base = rowdic[base]
+                try:
                     percentage_base = depth_base/sumall
                 except ZeroDivisionError:
                     percentage_base = 0                    
@@ -82,8 +83,8 @@ with open(input_csv) as f:
                     percentage_ref = 0
 
 # low read depth
-                    
-                if sumall < min_read_depth: 
+
+                if sumall < min_read_depth:
                     out = {'Position': position,
                            'Mutation': 'Read Depth <' + str(min_read_depth),
                            'Ref Base Rate':  ref + ' = ' + str(round(percentage_ref,2)),
@@ -92,7 +93,7 @@ with open(input_csv) as f:
                     output.append(out)
 
 # sufficient read depth, recode max base and mutation
-                    
+
                 elif ref != base:
                     mut = ref + ' to ' + base
                     out = {'Position': position,
@@ -130,5 +131,5 @@ try:
 except KeyError:
     pass
 df2.to_csv(depth_checker_filename)        
-        
+
     
